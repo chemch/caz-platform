@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-
+from prometheus_flask_exporter import PrometheusMetrics
 from app.model.detection import DetectionSchema, Detection
 from app.model.incident import IncidentSchema, Incident
 from app.model.alert_type import *
@@ -7,6 +7,7 @@ from app.model.alert_type import *
 
 app = Flask(__name__)
 app.config.from_object("alert_svc.config")
+metrics = PrometheusMetrics(app)
 
 alerts = [
     Detection('Malware Installation', 'c0202cf6aeab8437c638533d14563d35'),
