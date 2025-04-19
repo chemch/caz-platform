@@ -5,7 +5,7 @@ set -e  # Exit on error
 cd "$(dirname "$0")"
 
 # Environment variables
-export FLASK_APP=${FLASK_APP:-app.index}
+export FLASK_APP=${FLASK_APP:-main}
 export FLASK_ENV=${FLASK_ENV:-development}
 export PYTHONPATH=$(pwd)
 

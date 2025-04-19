@@ -6,6 +6,7 @@ from app.model.alert_type import *
 
 
 app = Flask(__name__)
+app.config.from_object("alert_svc.config")
 
 alerts = [
     Detection('Malware Installation', 2),
