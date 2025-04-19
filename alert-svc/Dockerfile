@@ -14,7 +14,7 @@ COPY requirements.txt .
 RUN --mount=type=cache,target=/root/.cache/pip pip install --no-cache-dir -r requirements.txt
 
 # Add your app and entrypoint
-COPY cashman ./cashman
+COPY app ./app
 COPY bootstrap.sh ./
 RUN chmod +x bootstrap.sh
 

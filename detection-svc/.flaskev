@@ -1,2 +1,2 @@
-FLASK_APP=cashman.index
+FLASK_APP=app.index
 FLASK_ENV=development

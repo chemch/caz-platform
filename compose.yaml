@@ -9,9 +9,24 @@ services:
     init: true
     ports:
       - "5002:5002"
+    environment:
+      - PORT=5002
     networks:
-      - alert-net
+      - caz-net
+
+  detection-svc:
+    build:
+      context: ./detection-svc
+    container_name: detection-svc
+    restart: unless-stopped
+    init: true
+    ports:
+      - "5001:5001"
+    environment:
+      - PORT=5001
+    networks:
+      - caz-net
 
 networks:
-  alert-net:
+  caz-net:
     driver: bridge
