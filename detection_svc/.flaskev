@@ -1,0 +1,2 @@
+FLASK_APP=detection_svc.main
+FLASK_ENV=development

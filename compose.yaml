@@ -16,14 +16,14 @@ services:
 
   detection-svc:
     build:
-      context: ./detection-svc
-    container_name: detection-svc
+      context: detection_svc
+    container_name: detection_svc
     restart: unless-stopped
     init: true
     ports:
-      - "5001:5001"
+      - "5004:5004"
     environment:
-      - PORT=5001
+      - PORT=5004
     networks:
       - caz-net
 

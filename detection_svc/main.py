@@ -5,6 +5,7 @@ from app.model.file_hash import FileHash, FileHashSchema
 from app.model.detection_type import *
 
 app = Flask(__name__)
+app.config.from_object("detection_svc.config")
 
 detections = [
     Beacon('Firewall', 'x.com', 100),
