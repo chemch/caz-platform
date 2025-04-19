@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   alert-svc:
     build:
@@ -6,11 +8,9 @@ services:
     restart: unless-stopped
     init: true
     ports:
-      - "5002:5002"  # Expose Flask app on host:container
-    # env_file: ./alert-svc/.env  # Uncomment if .env file exists
+      - "5002:5002"
     networks:
       - alert-net
-    # No external dependencies detected (e.g., database, cache)
 
 networks:
   alert-net:
