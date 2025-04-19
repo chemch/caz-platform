@@ -10,12 +10,23 @@ __pycache__/
 .coverage
 
 # 3. IDE and editor files
-alerting-svc/.idea/
+.idea/
 .vscode/
 *.swp
 *.swo
 
-# 4. Environment and secrets
+# 4. Build and distribution outputs
+dist/
+build/
+out/
+
+# 5. Test and debug files
+test/
+tests/
+debug/
+*.log
+
+# 6. Environment and secrets
 .env*
 *.env
 *.pem
@@ -24,54 +35,36 @@ alerting-svc/.idea/
 config.local.*
 *.local.yml
 
-# 5. Development/build artifacts
-dist/
-build/
-out/
+# 7. Project-specific patterns
+docs/
+*.md
+README*
+
+# 8. Docker and Compose files
+Dockerfile*
+docker-compose*
+
+# 9. Temporary and local files
 tmp/
 temp/
 *.tmp
 .local/
 local/
 
-# 6. Documentation
-README*
-*.md
-docs/
+# 10. Miscellaneous
+*.bak
 
-# 7. Docker and Compose files
-# (Do not ignore Dockerfile in the build context directory)
-docker-compose*
-
-# 8. System/OS files
-.DS_Store
-
-# 9. Project-specific
-# (No project-specific patterns detected beyond above)
-
-# 10. Other language-specific (not detected, but for completeness)
-# Node.js
-node_modules/
-npm-debug.log
-yarn-debug.log
-# Go
-/vendor/
-*.test
-.go-cache/
-# Java
-target/
-*.class
-.gradle/
-# SVN
-.svn/
-# Mercurial
-.hg/
-# Debug/log files
-debug/
-*.log
-
-# 11. Exclude virtual environments
+# Exclude virtual environments
 .venv/
 
-# 12. Exclude Flask environment file
-alert-svc/.flaskev
+# Exclude backup files
+*.bak
+
+# Exclude YAML files except compose.yaml
+# (If you want to keep compose.yaml, do not ignore *.yaml)
+# *.yaml
+
+# Exclude shell history and scripts if not needed
+# *.sh
+
+# Note: Pipfile.lock is intentionally NOT ignored as per instructions.

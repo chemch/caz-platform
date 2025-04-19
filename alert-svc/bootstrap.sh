@@ -1,19 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 
-# Navigate to the correct directory
-
-# shellcheck disable=SC2164
-cd "$(dirname "$0")"  # This ensures the script always runs from the directory it's located in
-
-# Set environment variables
+cd "$(dirname "$0")"
 export FLASK_APP=cashman.index
 export FLASK_ENV=development
-
-# shellcheck disable=SC2155
 export PYTHONPATH=$(pwd)
+python3 -m flask run --host=0.0.0.0 --port=5000
 
-# Optional: use a custom port if 5000 is busy
-PORT=${1:-5001}
-
-# Start Flask server
-flask run --debug --port="$PORT"

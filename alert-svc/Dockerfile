@@ -1,44 +1,19 @@
-# syntax=docker/dockerfile:1
+FROM python:3.12.8-alpine
 
-FROM python:3.12.8-alpine AS base
-
-# Install build dependencies and pipenv in a single layer for caching
-RUN apk add --no-cache gcc musl-dev libffi-dev && \
-    pip install --no-cache-dir pipenv
-
-# Builder stage: install dependencies to a virtualenv
-FROM base AS builder
-WORKDIR /usr/src/app
-
-# Copy Pipfile and Pipfile.lock first for better cache utilization
-COPY --link Pipfile Pipfile.lock ./
-
-# Install dependencies into a virtualenv managed by pipenv
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pipenv install --deploy --system
-
-# Final stage: minimal runtime image
-FROM python:3.12.8-alpine AS final
-
-# Create a non-root user
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Install system deps + Python build tools
+RUN apk add --no-cache gcc musl-dev libffi-dev bash
 
 WORKDIR /usr/src/app
 
-# Copy installed dependencies from builder
-COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
-COPY --from=builder /usr/local/bin /usr/local/bin
+# Install Python deps
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code and bootstrap script
-COPY --link cashman ./cashman
-COPY --link bootstrap.sh ./
-
-# Ensure bootstrap.sh is executable
+# Add your app and entrypoint
+COPY cashman ./cashman
+COPY bootstrap.sh ./
 RUN chmod +x bootstrap.sh
 
-# Expose the Flask port
-EXPOSE 5002
+EXPOSE 5000
 
-USER appuser
-
-ENTRYPOINT ["/usr/src/app/bootstrap.sh"]
+CMD ["./bootstrap.sh"]
