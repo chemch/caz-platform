@@ -1,11 +1,12 @@
 from flask import Flask, jsonify, request
-
+from prometheus_flask_exporter import PrometheusMetrics
 from app.model.beacon import Beacon, BeaconSchema
 from app.model.file_hash import FileHash, FileHashSchema
 from app.model.detection_type import *
 
 app = Flask(__name__)
 app.config.from_object("detection_svc.config")
+metrics = PrometheusMetrics(app)
 
 detections = [
     Beacon('Firewall', 'x.com', 100, '192.168.0.95', '167.89.76.91', 50878, 80, 'TCP'),

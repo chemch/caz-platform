@@ -11,6 +11,14 @@ export PYTHONPATH=$(pwd)
 
 # Allow port override via env or positional arg
 PORT=${1:-${PORT:-5004}}
+DEBUG="${2:-${DEBUG:-false}}"
 
-echo "[INFO] Starting Flask app: $FLASK_APP on port $PORT (env: $FLASK_ENV)"
-exec python3 -m flask run --host=0.0.0.0 --port="$PORT" --debug
+# Enable debug flag conditionally
+if [ "$DEBUG" = "true" ]; then
+  DEBUG_FLAG="--debug"
+else
+  DEBUG_FLAG=""
+fi
+
+echo "[INFO] Starting Flask app: $FLASK_APP on port $PORT (env: $FLASK_ENV, debug: $DEBUG)"
+exec python3 -m flask run --host=0.0.0.0 --port="$PORT" $DEBUG_FLAG

@@ -1,7 +1,7 @@
 from datetime import timedelta, datetime
 
 from flask import Flask, jsonify, request
-
+from prometheus_flask_exporter import PrometheusMetrics
 from app.model.report import ReportSchema, Report
 from app.model.indicator import IndicatorSchema, Indicator
 from app.model.intel_type import *
@@ -10,6 +10,7 @@ from intel_svc.app.model.verdict_type import VerdictType
 
 app = Flask(__name__)
 app.config.from_object("intel_svc.config")
+metrics = PrometheusMetrics(app)
 
 intel = [
     Report('Mallard Spider Update - 20250401', 'Mallard Spider Increases SoHo Coverage in US', 'UNC6786', 90, VerdictType.MALICIOUS, SeverityType.MEDIUM, 'VT', 67, datetime.now() - timedelta(days=10) ),
