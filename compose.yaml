@@ -11,6 +11,7 @@ services:
       - "5002:5002"
     environment:
       - PORT=5002
+      - DEBUG=true
     networks:
       - caz-net
 
