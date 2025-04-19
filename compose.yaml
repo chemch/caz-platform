@@ -27,6 +27,19 @@ services:
     networks:
       - caz-net
 
+  intel-svc:
+    build:
+      context: intel_svc
+    container_name: intel_svc
+    restart: unless-stopped
+    init: true
+    ports:
+      - "5008:5008"
+    environment:
+      - PORT=5008
+    networks:
+      - caz-net
+
 networks:
   caz-net:
     driver: bridge
