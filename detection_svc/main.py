@@ -13,6 +13,10 @@ detections = [
     FileHash('CrowdStrike', 'notepad.exe', 85, 'md5', 'c0202cf6aeab8437c638533d14563d35', '192.168.0.74')
 ]
 
+@app.route('/metrics')
+def metrics():
+    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+
 @app.route('/')
 def get_detections():
     _detections = []
