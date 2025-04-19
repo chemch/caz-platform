@@ -4,8 +4,9 @@ from marshmallow import Schema, fields
 
 
 class Alert(object):
-    def __init__(self, description, type):
+    def __init__(self, description, risk_level, type):
         self.description = description
+        self.risk_level = risk_level
         self.created_at = dt.datetime.now()
         self.type = type
 
@@ -15,5 +16,6 @@ class Alert(object):
 
 class AlertSchema(Schema):
     description = fields.Str()
+    risk_level = fields.Integer()
     created_at = fields.Date()
     type = fields.Str()

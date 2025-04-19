@@ -9,8 +9,8 @@ app = Flask(__name__)
 app.config.from_object("alert_svc.config")
 
 alerts = [
-    Detection('Malware Installation', 'c0202cf6aeab8437c638533d14563d35'),
-    Detection('C2 Beacon', '167.89.76.91'),
+    Detection('Malware Installation', 2),
+    Detection('C2 Beacon', 1),
     Incident('Accounts Hijacked', 5),
 ]
 

@@ -8,8 +8,8 @@ app = Flask(__name__)
 app.config.from_object("detection_svc.config")
 
 detections = [
-    Beacon('Firewall', 'x.com', 100),
-    FileHash('CrowdStrike', 'notepad.exe', 85, 'md5', 'c0202cf6aeab8437c638533d14563d35')
+    Beacon('Firewall', 'x.com', 100, '192.168.0.95', '167.89.76.91', 50878, 80, 'TCP'),
+    FileHash('CrowdStrike', 'notepad.exe', 85, 'md5', 'c0202cf6aeab8437c638533d14563d35', '192.168.0.74')
 ]
 
 @app.route('/')
