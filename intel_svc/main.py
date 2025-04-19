@@ -1,60 +1,65 @@
+from datetime import timedelta, datetime
+
 from flask import Flask, jsonify, request
 
-from app.model.detection import DetectionSchema, Detection
-from app.model.incident import IncidentSchema, Incident
-from app.model.alert_type import *
-
+from app.model.report import ReportSchema, Report
+from app.model.indicator import IndicatorSchema, Indicator
+from app.model.intel_type import *
+from intel_svc.app.model.severity_type import SeverityType
+from intel_svc.app.model.verdict_type import VerdictType
 
 app = Flask(__name__)
-app.config.from_object("alert_svc.config")
+app.config.from_object("intel_svc.config")
 
-alerts = [
-    Detection('Malware Installation', 2),
-    Detection('C2 Beacon', 1),
-    Incident('Accounts Hijacked', 5),
+intel = [
+    Report('Mallard Spider Update - 20250401', 'Mallard Spider Increases SoHo Coverage in US', 'UNC6786', 90, VerdictType.MALICIOUS, SeverityType.MEDIUM, 'VT', 67, datetime.now() - timedelta(days=10) ),
+    Indicator('DNS Exfiltration', 'APT43', 68, VerdictType.UNKNOWN, SeverityType.LOW, 'AlienVault', 'I-89775678', 'x.com'),
 ]
 
 @app.route('/')
-def get_alerts():
-    _alerts = []
-    for alert in alerts:
-        if alert.type == AlertType.DETECTION:
-            _alerts.append(DetectionSchema().dump(alert))
-        elif alert.type == AlertType.INCIDENT:
-            _alerts.append(IncidentSchema().dump(alert))
-    return jsonify(_alerts)
+def get_intel():
+    _intel = []
+    for artifact in intel:
+        print(artifact.type)
+        if artifact.type == IntelType.REPORT:
+            print('no way')
+            _intel.append(ReportSchema().dump(artifact))
+        elif artifact.type == IntelType.INDICATOR:
+            print('ok')
+            _intel.append(IndicatorSchema().dump(artifact))
+    return jsonify(_intel)
 
-@app.route('/detections')
-def get_detections():
-    schema = DetectionSchema(many=True)
-    detections = schema.dump(
-        filter(lambda t: t.type == AlertType.DETECTION, alerts)
+@app.route('/indicators')
+def get_indicators():
+    schema = IndicatorSchema(many=True)
+    indicators = schema.dump(
+        filter(lambda t: t.type == IntelType.INDICATOR, intel)
     )
 
-    return jsonify(detections)
+    return jsonify(indicators)
 
 
-@app.route('/detections', methods=['POST'])
-def add_detection():
-    detection = DetectionSchema().load(request.get_json())
-    alerts.append(detection)
+@app.route('/indicators', methods=['POST'])
+def add_indicator():
+    indicator = IndicatorSchema().load(request.get_json())
+    intel.append(indicator)
     return "", 204
 
 
-@app.route('/incidents')
-def get_incidents():
-    schema = IncidentSchema(many=True)
-    incidents = schema.dump(
-        filter(lambda t: t.type == AlertType.INCIDENT, alerts)
+@app.route('/reports')
+def get_reports():
+    schema = ReportSchema(many=True)
+    reports = schema.dump(
+        filter(lambda t: t.type == IntelType.REPORT, intel)
     )
 
-    return jsonify(incidents)
+    return jsonify(reports)
 
 
-@app.route('/incidents', methods=['POST'])
-def add_incident():
-    incident = IncidentSchema().load(request.get_json())
-    alerts.append(incident)
+@app.route('/reports', methods=['POST'])
+def add_report():
+    report = ReportSchema().load(request.get_json())
+    intel.append(report)
     return "", 204
 
 

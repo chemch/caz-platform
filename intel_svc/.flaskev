@@ -1,2 +1,2 @@
-FLASK_APP=alert_svc.main
+FLASK_APP=intel_svc.main
 FLASK_ENV=development

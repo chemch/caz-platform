@@ -14,13 +14,13 @@ WORKDIR /usr/src/app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy entire alert_svc codebase including app/, main.py, config.py, bootstrap.sh
-COPY . ./alert_svc
-WORKDIR /usr/src/app/alert_svc
+# Copy entire intel_svc codebase including app/, main.py, config.py, bootstrap.sh
+COPY . ./intel_svc
+WORKDIR /usr/src/app/intel_svc
 
 # Ensure bootstrap.sh is executable
 RUN chmod +x bootstrap.sh
 
-EXPOSE 5002
+EXPOSE 5008
 
 CMD ["./bootstrap.sh"]

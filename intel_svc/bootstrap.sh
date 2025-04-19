@@ -10,7 +10,7 @@ export FLASK_ENV=${FLASK_ENV:-development}
 export PYTHONPATH=$(pwd)
 
 # Allow port override via env or positional arg
-PORT=${1:-${PORT:-5002}}
+PORT=${1:-${PORT:-5008}}
 
 echo "[INFO] Starting Flask app: $FLASK_APP on port $PORT (env: $FLASK_ENV)"
 exec python3 -m flask run --host=0.0.0.0 --port="$PORT" --debug
