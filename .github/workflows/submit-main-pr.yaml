@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Validate PR source is develop or hotfix/*
         run: |
-          echo "🔍 Source branch: ${{ github.head_ref }}"
+          echo "Source branch: ${{ github.head_ref }}"
           if [[ "${{ github.head_ref }}" == "develop" || "${{ github.head_ref }}" == hotfix/* ]]; then
             echo "Allowed source branch: ${{ github.head_ref }}"
           else
