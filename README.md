@@ -1,3 +1,6 @@
+# caz-detection-svc
+Detection Engine for discovering notable artifacts.
+
 # caz-alerting-svc
 Cazadora - Alerting Microservice
 
