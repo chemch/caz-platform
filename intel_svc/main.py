@@ -35,9 +35,9 @@ if otlp_exporter:
     provider.add_span_processor(span_processor)
     trace.set_tracer_provider(provider)
     logging.info("Tempo tracing initialized.")
-
-# Always after set_tracer_provider
-tracer = trace.get_tracer(__name__)
+    tracer = trace.get_tracer(__name__)
+else:
+    tracer = trace.get_tracer("noop")
 
 app = Flask(__name__)
 app.config.from_object("intel_svc.config")
