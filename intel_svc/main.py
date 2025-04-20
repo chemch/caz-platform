@@ -13,25 +13,31 @@ from intel_svc.app.model.severity_type import SeverityType
 from intel_svc.app.model.verdict_type import VerdictType
 import logging
 import os
+import requests
 
+logging.basicConfig(level=logging.INFO)
 
-# Define a fallback tracer
-tracer = trace.get_tracer(__name__)
+# Default fallback
+otlp_exporter = None
+otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://tempo:4318/v1/traces")
 
-# Attempt to configure Tempo exporter with fallback if DNS/service is unavailable
 try:
-    otlp_exporter = OTLPSpanExporter(endpoint=os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://tempo:4318/v1/traces"))
-except Exception as dns_error:
-    logging.warning(f"Tempo service not available: {dns_error}. Falling back to no tracing.")
-    otlp_exporter = None
+    health_check_url = otlp_endpoint.replace("/v1/traces", "/")
+    response = requests.get(health_check_url, timeout=2)
+    response.raise_for_status()
+    otlp_exporter = OTLPSpanExporter(endpoint=otlp_endpoint)
+except Exception as e:
+    logging.warning(f"Tracing setup failed, continuing without tracing: {e}")
 
 if otlp_exporter:
     provider = TracerProvider(resource=Resource.create({"service.name": "intel-svc"}))
     span_processor = BatchSpanProcessor(otlp_exporter)
     provider.add_span_processor(span_processor)
     trace.set_tracer_provider(provider)
-    tracer = trace.get_tracer(__name__)
     logging.info("Tempo tracing initialized.")
+
+# Always after set_tracer_provider
+tracer = trace.get_tracer(__name__)
 
 app = Flask(__name__)
 app.config.from_object("intel_svc.config")
