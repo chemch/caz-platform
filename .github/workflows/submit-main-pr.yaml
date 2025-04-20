@@ -7,7 +7,7 @@ on:
 
 jobs:
   Validate-PR-Source:
-    name: Validate PR source branch
+    name: Validate PR source Branch
     runs-on: ubuntu-latest
 
     steps:
