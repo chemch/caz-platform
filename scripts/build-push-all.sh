@@ -21,7 +21,7 @@ aws ecr get-login-password --region "$AWS_REGION" | \
 # Find and process all Dockerfiles
 find . -name "Dockerfile" | while read -r dockerfile; do
   dir=$(dirname "$dockerfile")
-  service_name=$(basename "$dir")
+  service_name=$(basename "$dir" | tr '_' '-')
 
   echo "Building image for service: $service_name (found in $dir)"
 
