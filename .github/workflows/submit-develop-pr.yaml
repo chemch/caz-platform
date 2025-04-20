@@ -1,4 +1,4 @@
-name: Run Unit Tests on PR
+name: Run Unit Tests
 
 on:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - develop
 
 jobs:
-  Run-Unit-Tests:
+  run-unit-tests:
     runs-on: ubuntu-latest
 
     steps:
