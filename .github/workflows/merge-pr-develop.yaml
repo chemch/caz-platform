@@ -28,8 +28,8 @@ jobs:
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Make Build Script Runnable
-        run: chmod +x ${{ github.workspace }}/scripts/build-push-all.sh
+      - name: Make All Scripts Runnable
+        run: chmod +x ${{ github.workspace }}/scripts/*
 
       - name: Run ECR build and push script
         run: ${{ github.workspace }}/scripts/build-push-all.sh
@@ -37,3 +37,9 @@ jobs:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           IMAGE_TAG: ${{ github.sha }}
+
+      - name: Trigger Dispatch to CI/CD
+        run: ${{ github.workspace }}/scripts/trigger-dev-deploy.sh
+        env:
+          REPO_OWNER: ${{ github.repository_owner }}
+          GH_TOKEN: ${{ secrets.CONF_REPO_PAT }}
