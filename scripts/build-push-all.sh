@@ -1,7 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-REPO_BASE="cazadora"
 IMAGE_TAG="${IMAGE_TAG:-$(git rev-parse --short HEAD)}"
 
 if [[ -z "${AWS_REGION:-}" || -z "${AWS_ACCOUNT_ID:-}" ]]; then
@@ -25,8 +24,8 @@ find . -name "Dockerfile" | while read -r dockerfile; do
 
   echo "Building image for service: $service_name (found in $dir)"
 
-  IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_BASE/$service_name:$IMAGE_TAG"
-  LATEST_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$REPO_BASE/$service_name:latest"
+  IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:$IMAGE_TAG"
+  LATEST_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:latest"
 
   echo "Building image: $IMAGE_URI"
   docker build -t "$IMAGE_URI" "$dir"
