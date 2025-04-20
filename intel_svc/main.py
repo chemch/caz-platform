@@ -20,8 +20,7 @@ tracer = trace.get_tracer(__name__)
 
 # Attempt to configure Tempo exporter with fallback if DNS/service is unavailable
 try:
-    otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://tempo:4318/v1/traces")
-    otlp_exporter = OTLPSpanExporter(endpoint=otlp_endpoint)
+    otlp_exporter = OTLPSpanExporter(endpoint=os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://tempo:4318/v1/traces"))
 except Exception as dns_error:
     logging.warning(f"Tempo service not available: {dns_error}. Falling back to no tracing.")
     otlp_exporter = None
