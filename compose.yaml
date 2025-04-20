@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   alert-svc:
     build:
@@ -14,6 +12,9 @@ services:
       - DEBUG=true
     networks:
       - caz-net
+    depends_on:
+      - detection-svc
+      - intel-svc
 
   detection-svc:
     build:

@@ -1,5 +1,4 @@
 from flask import Flask, jsonify, request
-from prometheus_flask_exporter import PrometheusMetrics
 from app.model.beacon import Beacon, BeaconSchema
 from app.model.file_hash import FileHash, FileHashSchema
 from app.model.detection_type import *
@@ -45,11 +44,11 @@ detections = [
 ]
 
 # Traced endpoint
-@app.route('/test')
+@app.route('/health')
 def index():
-    with tracer.start_span('home-span') as span:
-        span.set_tag('endpoint', '/test')
-        return "Test Endpoint"
+    with tracer.start_span('health-span') as span:
+        span.set_tag('endpoint', '/health')
+        return "Up"
 
 @app.route('/')
 def get_detections():

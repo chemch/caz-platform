@@ -1,7 +1,11 @@
 from datetime import timedelta, datetime
-
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
 from flask import Flask, jsonify, request
-from prometheus_flask_exporter import PrometheusMetrics
 from app.model.report import ReportSchema, Report
 from app.model.indicator import IndicatorSchema, Indicator
 from app.model.intel_type import *
@@ -10,30 +14,35 @@ from intel_svc.app.model.verdict_type import VerdictType
 
 app = Flask(__name__)
 app.config.from_object("intel_svc.config")
-metrics = PrometheusMetrics(app)
+
+trace.set_tracer_provider(TracerProvider(resource=resource))
+tracer = trace.get_tracer(__name__)
+
+otlp_exporter = OTLPSpanExporter(endpoint="http://tempo.tracing.svc.cluster.local:4318/v1/traces", insecure=True)
+span_processor = BatchSpanProcessor(otlp_exporter)
+trace.get_tracer_provider().add_span_processor(span_processor)
+
+FlaskInstrumentor().instrument_app(app)
+
+
 
 intel = [
     Report('Mallard Spider Update - 20250401', 'Mallard Spider Increases SoHo Coverage in US', 'UNC6786', 90, VerdictType.MALICIOUS, SeverityType.MEDIUM, 'VT', 67, datetime.now() - timedelta(days=10) ),
     Indicator('DNS Exfiltration', 'APT43', 68, VerdictType.UNKNOWN, SeverityType.LOW, 'AlienVault', 'I-89775678', 'x.com'),
 ]
 
-@app.route('/metrics')
-def metrics():
-    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
-
 
 @app.route('/')
 def get_intel():
-    _intel = []
-    for artifact in intel:
-        print(artifact.type)
-        if artifact.type == IntelType.REPORT:
-            print('no way')
-            _intel.append(ReportSchema().dump(artifact))
-        elif artifact.type == IntelType.INDICATOR:
-            print('ok')
-            _intel.append(IndicatorSchema().dump(artifact))
-    return jsonify(_intel)
+    with tracer.start_as_current_span("get_intel"):
+        _intel = []
+        for artifact in intel:
+            print(artifact.type)
+            if artifact.type == IntelType.REPORT:
+                _intel.append(ReportSchema().dump(artifact))
+            elif artifact.type == IntelType.INDICATOR:
+                _intel.append(IndicatorSchema().dump(artifact))
+        return jsonify(_intel)
 
 @app.route('/indicators')
 def get_indicators():
