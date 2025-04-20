@@ -1,6 +1,9 @@
 # caz-alerting-svc
 Cazadora - Alerting Microservice
 
+# caz-detection-svc
+Cazadora - Detection Microservice
+
 ## Running with Docker
 
 This project is containerized using Docker and Docker Compose. It uses Python 3.12.8 (alpine) and manages dependencies with Pipenv. The main service runs on port `5002`.
