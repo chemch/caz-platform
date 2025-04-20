@@ -11,21 +11,31 @@ from app.model.indicator import IndicatorSchema, Indicator
 from app.model.intel_type import *
 from intel_svc.app.model.severity_type import SeverityType
 from intel_svc.app.model.verdict_type import VerdictType
+import logging
+import os
 
+
+# Define a fallback tracer
+tracer = trace.get_tracer(__name__)
+
+# Attempt to configure Tempo exporter with fallback if DNS/service is unavailable
+try:
+    otlp_endpoint = os.getenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://tempo:4318/v1/traces")
+    otlp_exporter = OTLPSpanExporter(endpoint=otlp_endpoint)
+except Exception as dns_error:
+    logging.warning(f"Tempo service not available: {dns_error}. Falling back to no tracing.")
+    otlp_exporter = None
+
+if otlp_exporter:
+    provider = TracerProvider(resource=Resource.create({"service.name": "intel-svc"}))
+    span_processor = BatchSpanProcessor(otlp_exporter)
+    provider.add_span_processor(span_processor)
+    trace.set_tracer_provider(provider)
+    tracer = trace.get_tracer(__name__)
+    logging.info("Tempo tracing initialized.")
 
 app = Flask(__name__)
 app.config.from_object("intel_svc.config")
-
-resource = Resource.create({"service.name": "intel-svc"})
-trace.set_tracer_provider(TracerProvider(resource=resource))
-tracer = trace.get_tracer(__name__)
-
-otlp_exporter = OTLPSpanExporter(
-    endpoint="http://tempo.tracing.svc.cluster.local:4318/v1/traces"
-)
-
-span_processor = BatchSpanProcessor(otlp_exporter)
-trace.get_tracer_provider().add_span_processor(span_processor)
 
 FlaskInstrumentor().instrument_app(app)
 

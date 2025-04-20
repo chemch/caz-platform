@@ -9,7 +9,7 @@ services:
       - "5002:5002"
     environment:
       - PORT=5002
-      - DEBUG=true
+      - DEBUG=false
     networks:
       - caz-net
     depends_on:
@@ -26,8 +26,15 @@ services:
       - "5004:5004"
     environment:
       - PORT=5004
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=caz_db
+      - DB_USER=caz_user
+      - DB_PASSWORD=caz_pass
     networks:
       - caz-net
+    depends_on:
+      - postgres
 
   intel-svc:
     build:
@@ -39,8 +46,17 @@ services:
       - "5008:5008"
     environment:
       - PORT=5008
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=caz_db
+      - DB_USER=caz_user
+      - DB_PASSWORD=caz_pass
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318
     networks:
       - caz-net
+    depends_on:
+      - postgres
+      - tempo
 
   postgres:
     image: postgres:16
@@ -54,6 +70,15 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    networks:
+      - caz-net
+
+  tempo:
+    image: grafana/tempo:1.21.0
+    container_name: tempo
+    restart: unless-stopped
+    ports:
+      - "4318:4318"
     networks:
       - caz-net
 
