@@ -1,0 +1,22 @@
+name: Validate PR Source
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  Validate-PR-Source:
+    name: Validate PR source branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Validate PR source is develop or hotfix/*
+        run: |
+          echo "Source branch: ${{ github.head_ref }}"
+          if [[ "${{ github.head_ref }}" == "develop" || "${{ github.head_ref }}" == hotfix/* ]]; then
+            echo "Allowed source branch: ${{ github.head_ref }}"
+          else
+            echo "Only 'develop' or 'hotfix/*' branches can merge into 'main'"
+            exit 1
+          fi
