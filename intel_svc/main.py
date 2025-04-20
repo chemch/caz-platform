@@ -12,16 +12,12 @@ from app.model.intel_type import *
 from intel_svc.app.model.severity_type import SeverityType
 from intel_svc.app.model.verdict_type import VerdictType
 
+
 app = Flask(__name__)
 app.config.from_object("intel_svc.config")
 
-trace.set_tracer_provider(
-    TracerProvider(
-        resource=Resource.create({
-            "service.name": "intel-svc"
-        })
-    )
-)
+resource = Resource.create({"service.name": "intel-svc"})
+trace.set_tracer_provider(TracerProvider(resource=resource))
 tracer = trace.get_tracer(__name__)
 
 otlp_exporter = OTLPSpanExporter(endpoint="http://tempo.tracing.svc.cluster.local:4318/v1/traces", insecure=True)
