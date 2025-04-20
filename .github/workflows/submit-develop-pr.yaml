@@ -1,4 +1,4 @@
-name: Run Unit Tests on PR (to develop)
+name: Run Unit Tests on PR
 
 on:
   pull_request:
