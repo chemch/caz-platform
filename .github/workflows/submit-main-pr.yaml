@@ -1,4 +1,4 @@
-name: Run Unit Tests on PR (to main)
+name: Validate PR Source
 
 on:
   pull_request:
