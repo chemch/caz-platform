@@ -1,3 +1,4 @@
 flask
 marshmallow
 prometheus-flask-exporter
+jaeger-client

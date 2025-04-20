@@ -3,19 +3,53 @@ from prometheus_flask_exporter import PrometheusMetrics
 from app.model.beacon import Beacon, BeaconSchema
 from app.model.file_hash import FileHash, FileHashSchema
 from app.model.detection_type import *
+from jaeger_client import Config
+import logging
+import atexit
 
 app = Flask(__name__)
 app.config.from_object("detection_svc.config")
+
+# Setup Prometheus metrics
 metrics = PrometheusMetrics(app)
 
+# Configure logging cleanly
+logging.getLogger('').handlers = []
+logging.basicConfig(format='%(message)s', level=logging.DEBUG)
+
+# Initialize Jaeger tracer
+def init_tracer(service_name):
+    config = Config(
+        config={
+            'sampler': {'type': 'const', 'param': 1},
+            'logging': True,
+            'reporter_batch_size': 1,
+            'local_agent': {
+                'reporting_host': 'jaeger-agent.tracing.svc.cluster.local',
+                'reporting_port': 6831,
+            },
+        },
+        service_name=service_name,
+    )
+    return config.initialize_tracer()
+
+tracer = init_tracer('detection-svc')
+
+# Ensure trace is closed at shutdown so traces flush
+atexit.register(tracer.close)
+
+# Mock data
 detections = [
     Beacon('Firewall', 'x.com', 100, '192.168.0.95', '167.89.76.91', 50878, 80, 'TCP'),
     FileHash('CrowdStrike', 'notepad.exe', 85, 'md5', 'c0202cf6aeab8437c638533d14563d35', '192.168.0.74')
 ]
 
-@app.route('/metrics')
-def metrics():
-    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+# Traced endpoint
+@app.route('/test')
+def index():
+    with tracer.start_span('home-span') as span:
+        span.set_tag('endpoint', '/test')
+        return "Test Endpoint"
 
 @app.route('/')
 def get_detections():
@@ -35,13 +69,11 @@ def get_beacons():
     )
     return jsonify(beacons)
 
-
 @app.route('/beacons', methods=['POST'])
 def add_beacon():
     beacon = BeaconSchema().load(request.get_json())
     detections.append(beacon)
     return "", 204
-
 
 @app.route('/file_hashes')
 def get_file_hashes():
@@ -51,13 +83,11 @@ def get_file_hashes():
     )
     return jsonify(file_hashes)
 
-
 @app.route('/file_hashes', methods=['POST'])
 def add_file_hash():
     file_hash = FileHashSchema().load(request.get_json())
     detections.append(file_hash)
     return "", 204
-
 
 if __name__ == "__main__":
     app.run()
