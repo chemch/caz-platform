@@ -15,7 +15,13 @@ from intel_svc.app.model.verdict_type import VerdictType
 app = Flask(__name__)
 app.config.from_object("intel_svc.config")
 
-trace.set_tracer_provider(TracerProvider(resource=resource))
+trace.set_tracer_provider(
+    TracerProvider(
+        resource=Resource.create({
+            "service.name": "intel-svc"
+        })
+    )
+)
 tracer = trace.get_tracer(__name__)
 
 otlp_exporter = OTLPSpanExporter(endpoint="http://tempo.tracing.svc.cluster.local:4318/v1/traces", insecure=True)
@@ -23,8 +29,6 @@ span_processor = BatchSpanProcessor(otlp_exporter)
 trace.get_tracer_provider().add_span_processor(span_processor)
 
 FlaskInstrumentor().instrument_app(app)
-
-
 
 intel = [
     Report('Mallard Spider Update - 20250401', 'Mallard Spider Increases SoHo Coverage in US', 'UNC6786', 90, VerdictType.MALICIOUS, SeverityType.MEDIUM, 'VT', 67, datetime.now() - timedelta(days=10) ),
