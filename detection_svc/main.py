@@ -9,9 +9,6 @@ import atexit
 app = Flask(__name__)
 app.config.from_object("detection_svc.config")
 
-# Setup Prometheus metrics
-metrics = PrometheusMetrics(app)
-
 # Configure logging cleanly
 logging.getLogger('').handlers = []
 logging.basicConfig(format='%(message)s', level=logging.DEBUG)
