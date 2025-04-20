@@ -42,6 +42,24 @@ services:
     networks:
       - caz-net
 
+  postgres:
+    image: postgres:16
+    container_name: caz_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: caz_db
+      POSTGRES_USER: caz_user
+      POSTGRES_PASSWORD: caz_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - caz-net
+
 networks:
   caz-net:
     driver: bridge
+
+volumes:
+  postgres_data:

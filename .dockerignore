@@ -60,8 +60,8 @@ local/
 # Exclude backup files
 *.bak
 
-# Exclude YAML files except compose.yaml
-# (If you want to keep compose.yaml, do not ignore *.yaml)
+# Exclude YAML files except compose-local.yaml
+# (If you want to keep compose-local.yaml, do not ignore *.yaml)
 # *.yaml
 
 # Exclude shell history and scripts if not needed

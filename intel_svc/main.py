@@ -20,7 +20,10 @@ resource = Resource.create({"service.name": "intel-svc"})
 trace.set_tracer_provider(TracerProvider(resource=resource))
 tracer = trace.get_tracer(__name__)
 
-otlp_exporter = OTLPSpanExporter(endpoint="http://tempo.tracing.svc.cluster.local:4318/v1/traces", insecure=True)
+otlp_exporter = OTLPSpanExporter(
+    endpoint="http://tempo.tracing.svc.cluster.local:4318/v1/traces"
+)
+
 span_processor = BatchSpanProcessor(otlp_exporter)
 trace.get_tracer_provider().add_span_processor(span_processor)
 
