@@ -28,23 +28,23 @@ jobs:
 
       - name: Log in to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
-
-      - name: Build and Push Dockerfiles
-        env:
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
-        run: |
-          find . -name "Dockerfile" | while read dockerfile; do
-            dir=$(dirname "$dockerfile")
-            service_name=$(basename "$dir")
-          
-            echo "📦 Building $service_name from $dockerfile"
-          
-            IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:${GITHUB_SHA}"
-            docker build -t $IMAGE "$dir"
-            docker tag $IMAGE "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:latest"
-          
-            echo "🚀 Pushing $service_name to ECR..."
-            docker push $IMAGE
-            docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:latest"
-          done
+#
+#      - name: Build and Push Dockerfiles
+#        env:
+#          AWS_REGION: ${{ secrets.AWS_REGION }}
+#          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+#        run: |
+#          find . -name "Dockerfile" | while read dockerfile; do
+#            dir=$(dirname "$dockerfile")
+#            service_name=$(basename "$dir")
+#
+#            echo "📦 Building $service_name from $dockerfile"
+#
+#            IMAGE="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:${GITHUB_SHA}"
+#            docker build -t $IMAGE "$dir"
+#            docker tag $IMAGE "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:latest"
+#
+#            echo "🚀 Pushing $service_name to ECR..."
+#            docker push $IMAGE
+#            docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:latest"
+#          done
