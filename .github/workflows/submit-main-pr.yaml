@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  Validate PR Source Branch:
+  Validate-PR-Source:
     name: Validate PR source branch
     runs-on: ubuntu-latest
 

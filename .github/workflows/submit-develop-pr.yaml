@@ -6,7 +6,7 @@ on:
       - develop
 
 jobs:
-  Run Unit Tests:
+  Run-Unit-Tests:
     runs-on: ubuntu-latest
 
     steps:
