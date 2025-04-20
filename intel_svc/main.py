@@ -17,6 +17,11 @@ intel = [
     Indicator('DNS Exfiltration', 'APT43', 68, VerdictType.UNKNOWN, SeverityType.LOW, 'AlienVault', 'I-89775678', 'x.com'),
 ]
 
+@app.route('/metrics')
+def metrics():
+    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
+
+
 @app.route('/')
 def get_intel():
     _intel = []
