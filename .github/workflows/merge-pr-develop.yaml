@@ -31,7 +31,7 @@ jobs:
       - name: Make All Scripts Runnable
         run: chmod +x ${{ github.workspace }}/scripts/*
 
-      - name: Run ECR build and push script
+      - name: Run ECR build and push Script
         run: ${{ github.workspace }}/scripts/build-push-all.sh dev
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
