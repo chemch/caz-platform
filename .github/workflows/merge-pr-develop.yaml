@@ -32,7 +32,7 @@ jobs:
         run: chmod +x ${{ github.workspace }}/scripts/*
 
       - name: Run ECR build and push script
-        run: ${{ github.workspace }}/scripts/build-push-all.sh
+        run: ${{ github.workspace }}/scripts/build-push-all.sh dev
         env:
           AWS_REGION: ${{ secrets.AWS_REGION }}
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
