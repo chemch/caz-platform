@@ -21,7 +21,7 @@ if [[ -z "$REPO_OWNER" || -z "$GH_TOKEN" ]]; then
 fi
 
 # === DISPATCH ===
-echo "🚀 Sending dispatch to $REPO_OWNER/$TARGET_REPO..."
+echo "Sending dispatch to $REPO_OWNER/$TARGET_REPO..."
 curl -X POST \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: token $GH_TOKEN" \
