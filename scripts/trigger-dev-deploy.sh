@@ -6,7 +6,7 @@ set -euo pipefail
 REPO_OWNER="${REPO_OWNER:-}"
 GH_TOKEN="${GH_TOKEN:-}"
 TARGET_REPO="caz-conf"
-EVENT_TYPE="start-dev-deployment"
+EVENT_TYPE="start-deployment"
 REF="develop"
 SHA=$(git rev-parse HEAD)
 
@@ -30,4 +30,4 @@ curl -X POST \
     }
   }"
 
-echo "Dispatch sent!"
+echo "Dispatch sent!!!!!"
