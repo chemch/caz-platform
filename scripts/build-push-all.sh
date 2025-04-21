@@ -39,4 +39,4 @@ find . -name "Dockerfile" | while read -r dockerfile; do
   echo "Done with $service_name"
 done
 
-echo "All images built and pushed successfully!!"
+echo "All images built and pushed successfully!!!"
