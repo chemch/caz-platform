@@ -42,4 +42,4 @@ jobs:
         run: ${{ github.workspace }}/scripts/trigger-deploy.sh dev dev
         env:
           REPO_OWNER: ${{ github.repository_owner }}
-          GH_TOKEN: ${{ secrets.CONF_REPO_PAT }}
+          GH_TOKEN: ${{ secrets.REPO_PAT }}
