@@ -1,4 +1,4 @@
-name: Trigger Dev Build
+name: Build Dev Images
 
 on:
   push:
