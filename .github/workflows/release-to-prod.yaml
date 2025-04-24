@@ -1,0 +1,37 @@
+name: Promote Release to Prod
+
+on:
+  release:
+    types: [published]  # Only when a GitHub Release is created/published
+
+jobs:
+  promote-to-prod:
+    name: Promote Image to Prod
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      VERSION: ${{ github.event.release.tag_name }}
+      ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+    steps:
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Promote services to prod
+        run: |
+          for SERVICE in alert-svc detection-svc intel-svc; do
+            docker pull "$ECR_URI/$SERVICE:uat_${VERSION}"
+            docker tag "$ECR_URI/$SERVICE:uat_${VERSION}" "$ECR_URI/$SERVICE:prod_${VERSION}"
+            docker push "$ECR_URI/$SERVICE:prod_${VERSION}"
+            echo "✅ Promoted $SERVICE:uat_${VERSION} → prod_${VERSION}"
+          done
