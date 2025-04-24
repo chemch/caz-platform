@@ -50,7 +50,7 @@ jobs:
           curl -X POST \
             -H "Authorization: token ${{ secrets.REPO_PAT }}" \
             -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/chemch/caz_conf/dispatches \
+            https://api.github.com/repos/chemch/caz-conf/dispatches \
             -d '{
               "event_type": "start-deployment",
               "client_payload": {
