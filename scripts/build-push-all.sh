@@ -1,8 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 
-# Accept image tag as first argument, default to "dev_<timestamp>" if not provided
-IMAGE_TAG="${1:-dev_$(date +%Y%m%d%H%M)}"
+# Accept environment as first argument, required
+ENVIRONMENT="${1:-}"
+if [[ -z "$ENVIRONMENT" ]]; then
+  echo "Usage: $0 <environment>"
+  echo "Example: $0 dev"
+  exit 1
+fi
+
+# Dynamically generate image tag: e.g. dev_202504231920
+TIMESTAMP=$(date +%Y%m%d%H%M)
+IMAGE_TAG="${ENVIRONMENT}_${TIMESTAMP}"
 
 # Require AWS_REGION and AWS_ACCOUNT_ID to be set
 if [[ -z "${AWS_REGION:-}" || -z "${AWS_ACCOUNT_ID:-}" ]]; then
