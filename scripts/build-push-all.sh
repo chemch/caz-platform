@@ -1,53 +1,68 @@
 #!/bin/bash
 set -euo pipefail
 
-# Accept environment as first argument, required
+# === Inputs ===
 ENVIRONMENT="${1:-}"
+SERVICE_NAME="${2:-}"  # Optional
+
 if [[ -z "$ENVIRONMENT" ]]; then
-  echo "Usage: $0 <environment>"
+  echo "Usage: $0 <environment> [service_name]"
   echo "Example: $0 dev"
   exit 1
 fi
 
-# Dynamically generate image tag: e.g. dev_202504231920
+# === Image tag generation ===
 TIMESTAMP=$(date +%Y%m%d%H%M)
 IMAGE_TAG="${ENVIRONMENT}_${TIMESTAMP}"
 
-# Require AWS_REGION and AWS_ACCOUNT_ID to be set
+# === Validate AWS vars ===
 if [[ -z "${AWS_REGION:-}" || -z "${AWS_ACCOUNT_ID:-}" ]]; then
   echo "ERROR: AWS_REGION and AWS_ACCOUNT_ID must be set in environment"
   exit 1
 fi
 
-echo "Using AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
+echo "AWS_ACCOUNT_ID: $AWS_ACCOUNT_ID"
 echo "AWS_REGION: $AWS_REGION"
-echo "Image tag: $IMAGE_TAG"
+echo "ENVIRONMENT: $ENVIRONMENT"
+echo "IMAGE_TAG: $IMAGE_TAG"
+echo "SERVICE_NAME: ${SERVICE_NAME:-<all>}"
 
-echo "Logging in to Amazon ECR..."
+# === Log in to ECR ===
 aws ecr get-login-password --region "$AWS_REGION" | \
   docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
 
-# Build and push all Dockerfiles
-find . -name "Dockerfile" | while read -r dockerfile; do
-  dir=$(dirname "$dockerfile")
-  service_name=$(basename "$dir" | tr '_' '-')
+# === Build logic ===
+build_and_push() {
+  local dir="$1"
+  local svc_name
+  svc_name=$(basename "$dir" | tr '_' '-')
 
-  echo "Building image for service: $service_name (found in $dir)"
+  IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$svc_name:$IMAGE_TAG"
+  LATEST_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$svc_name:latest"
 
-  IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:$IMAGE_TAG"
-  LATEST_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$service_name:latest"
-
-  echo "Building image: $IMAGE_URI"
+  echo "🚧 Building image for service: $svc_name"
   docker build -t "$IMAGE_URI" "$dir"
-
-  echo "Tagging as latest: $LATEST_URI"
   docker tag "$IMAGE_URI" "$LATEST_URI"
 
-  echo "Pushing to ECR..."
+  echo "📤 Pushing to ECR: $IMAGE_URI and $LATEST_URI"
   docker push "$IMAGE_URI"
   docker push "$LATEST_URI"
 
-  echo "Done with $service_name"
-done
+  echo "✅ Finished: $svc_name"
+}
 
-echo "All images built and pushed successfully with tag: $IMAGE_TAG"
+# === Single service or all ===
+if [[ -n "$SERVICE_NAME" ]]; then
+  TARGET_DIR=$(find . -type d -name "$SERVICE_NAME" | head -n 1)
+  if [[ -z "$TARGET_DIR" ]]; then
+    echo "ERROR: Service directory for $SERVICE_NAME not found"
+    exit 1
+  fi
+  build_and_push "$TARGET_DIR"
+else
+  find . -name "Dockerfile" | while read -r dockerfile; do
+    build_and_push "$(dirname "$dockerfile")"
+  done
+fi
+
+echo "🚀 All image builds complete (tag: $IMAGE_TAG)"
