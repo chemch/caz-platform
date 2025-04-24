@@ -38,7 +38,7 @@ jobs:
           AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
           IMAGE_TAG: ${{ github.sha }}
 
-      - name: Trigger Dispatch to CI/CD
+      - name: Trigger Dispatch to CI/CD Flow
         run: ${{ github.workspace }}/scripts/trigger-deploy.sh dev dev
         env:
           REPO_OWNER: ${{ github.repository_owner }}
