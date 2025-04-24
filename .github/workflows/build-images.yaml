@@ -1,31 +1,27 @@
 name: Build and Push to ECR
 
 on:
-  push:
-    branches:
-      - develop
-
-    workflow_call:
-      inputs:
-        environment:
-          required: true
-          type: string
-        service_name:
-          required: false
-          type: string
-      secrets:
-        AWS_REGION:
-          required: true
-        AWS_ACCOUNT_ID:
-          required: true
-        AWS_ACCESS_KEY_ID:
-          required: true
-        AWS_SECRET_ACCESS_KEY:
-          required: true
-        AWS_SESSION_TOKEN:
-          required: true
-        REPO_PAT:
-          required: true
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      service_name:
+        required: false
+        type: string
+    secrets:
+      AWS_REGION:
+        required: true
+      AWS_ACCOUNT_ID:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
+      AWS_SESSION_TOKEN:
+        required: true
+      REPO_PAT:
+        required: true
 
   workflow_dispatch:
     inputs:

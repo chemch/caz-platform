@@ -1,6 +1,9 @@
 name: Trigger Dev Build
 
 on:
+  push:
+    branches:
+      - develop
   workflow_dispatch:
 
 jobs:
