@@ -1,8 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+# Accept image tag as first argument, default to "dev_<timestamp>" if not provided
 IMAGE_TAG="${1:-dev_$(date +%Y%m%d%H%M)}"
 
+# Require AWS_REGION and AWS_ACCOUNT_ID to be set
 if [[ -z "${AWS_REGION:-}" || -z "${AWS_ACCOUNT_ID:-}" ]]; then
   echo "ERROR: AWS_REGION and AWS_ACCOUNT_ID must be set in environment"
   exit 1
@@ -16,7 +18,7 @@ echo "Logging in to Amazon ECR..."
 aws ecr get-login-password --region "$AWS_REGION" | \
   docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
 
-# Find all Dockerfiles and build/push them
+# Build and push all Dockerfiles
 find . -name "Dockerfile" | while read -r dockerfile; do
   dir=$(dirname "$dockerfile")
   service_name=$(basename "$dir" | tr '_' '-')
@@ -39,4 +41,4 @@ find . -name "Dockerfile" | while read -r dockerfile; do
   echo "Done with $service_name"
 done
 
-echo "All images built and pushed successfully!!!"
+echo "All images built and pushed successfully with tag: $IMAGE_TAG"
