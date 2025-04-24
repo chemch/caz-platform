@@ -42,8 +42,8 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      ENVIRONMENT: ${{ github.event.inputs.environment || github.event.client_payload.environment }}
-      SERVICE_NAME: ${{ github.event.inputs.service_name || github.event.client_payload.service_name }}
+      ENVIRONMENT: ${{ inputs.environment || github.event.client_payload.environment }}
+      SERVICE_NAME: ${{ inputs.service_name || github.event.client_payload.service_name }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       IMAGE_TAG: ${{ github.sha }}
@@ -70,7 +70,7 @@ jobs:
         run: chmod +x ${{ github.workspace }}/scripts/*
 
       - name: Run ECR Build and Push Script
-        run: ./scripts/build-push-all.sh "$ENVIRONMENT"
+        run: ./scripts/build-push-all.sh "$ENVIRONMENT" "$SERVICE_NAME"
 
       - name: Trigger Deploy Workflow
         run: ./scripts/trigger-deploy.sh "$ENVIRONMENT" "$SERVICE_NAME"

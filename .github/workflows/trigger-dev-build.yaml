@@ -8,7 +8,7 @@ on:
 
 jobs:
   call-build-push-images:
-    uses: build-images.yaml
+    uses: ./.github/workflows/build-images.yaml
     with:
       environment: dev
     secrets:
