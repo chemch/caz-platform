@@ -1,0 +1,60 @@
+name: Promote to UAT
+
+on:
+  workflow_dispatch:
+    inputs:
+      service_name:
+        description: Service to promote (e.g. alert-svc)
+        required: true
+        type: string
+      version:
+        description: Version to promote (e.g. v1.2.3)
+        required: true
+        type: string
+
+jobs:
+  promote:
+    name: Retag and Promote Image to UAT
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      SERVICE_NAME: ${{ inputs.service_name }}
+      VERSION: ${{ inputs.version }}
+      QA_TAG: qa_${{ inputs.version }}
+      UAT_TAG: uat_${{ inputs.version }}
+      ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Pull QA image and retag for UAT
+        run: |
+          docker pull "$ECR_URI/$SERVICE_NAME:$QA_TAG"
+          docker tag "$ECR_URI/$SERVICE_NAME:$QA_TAG" "$ECR_URI/$SERVICE_NAME:$UAT_TAG"
+          docker push "$ECR_URI/$SERVICE_NAME:$UAT_TAG"
+          echo "✅ Promoted $SERVICE_NAME:$QA_TAG → $UAT_TAG"
+
+      - name: Trigger UAT Deployment
+        run: |
+          curl -X POST \
+            -H "Authorization: token ${{ secrets.REPO_PAT }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/YOUR_ORG/YOUR_CONF_REPO/dispatches \
+            -d '{
+              "event_type": "start-deployment",
+              "client_payload": {
+                "environment": "uat",
+                "service_name": "${{ inputs.service_name }}"
+              }
+            }'
