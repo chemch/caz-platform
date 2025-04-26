@@ -63,5 +63,10 @@ def count_incidents():
     incident_count = len([a for a in alerts if a.type == AlertType.INCIDENT])
     return jsonify({"incidents": incident_count})
 
+@app.route('/detections/count')
+def count_detections():
+    detection_count = len([a for a in alerts if a.type == AlertType.DETECTION])
+    return jsonify({"detections": detection_count})
+
 if __name__ == "__main__":
     app.run()
