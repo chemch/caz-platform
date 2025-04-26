@@ -55,4 +55,4 @@ jobs:
             
             Image URI: `${{ env.ECR_URI }}/${{ env.SERVICE_NAME }}:${{ env.PROD_TAG }}`
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_PAT }}
