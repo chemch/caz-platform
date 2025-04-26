@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # === CONFIG ===
-REPO_OWNER="${REPO_OWNER:-}"        # e.g. chemch
-GH_TOKEN="${GH_TOKEN:-}"            # GitHub PAT
+REPO_OWNER="${REPO_OWNER:-}"
+GH_TOKEN="${GH_TOKEN:-}"
 TARGET_REPO="caz-conf"
 EVENT_TYPE="start-deployment"
 
@@ -13,7 +13,7 @@ SERVICE_NAME="${2:-}"
 
 # === VALIDATION ===
 if [[ -z "$REPO_OWNER" || -z "$GH_TOKEN" ]]; then
-  echo "REPO_OWNER and GH_TOKEN must be set"
+  echo "REPO_OWNER and GH_TOKEN Required"
   exit 1
 fi
 
@@ -41,11 +41,11 @@ else
 fi
 
 # === DISPATCH ===
-echo "Sending dispatch to $REPO_OWNER/$TARGET_REPO..."
+echo "Sending Dispatch: $REPO_OWNER/$TARGET_REPO..."
 curl -X POST \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: token $GH_TOKEN" \
   https://api.github.com/repos/$REPO_OWNER/$TARGET_REPO/dispatches \
   -d "$PAYLOAD"
 
-echo "Dispatch sent: environment=$ENVIRONMENT ${SERVICE_NAME:+service=$SERVICE_NAME}"
+echo "Dispatch Sent: ENV=$ENVIRONMENT ${SERVICE_NAME:+service=$SERVICE_NAME}"
