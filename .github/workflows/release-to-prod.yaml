@@ -43,15 +43,16 @@ jobs:
           docker pull "$ECR_URI/$SERVICE_NAME:$UAT_TAG"
           docker tag "$ECR_URI/$SERVICE_NAME:$UAT_TAG" "$ECR_URI/$SERVICE_NAME:$PROD_TAG"
           docker push "$ECR_URI/$SERVICE_NAME:$PROD_TAG"
-          echo "Promoted $SERVICE_NAME:$UAT_TAG → $PROD_TAG"
+          echo "✅ Promoted $SERVICE_NAME:$UAT_TAG → $PROD_TAG"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: prod_${{ inputs.uat_tag }}
-          name: Production Release - ${{ inputs.service_name }} ${{ inputs.uat_tag }}
+          tag_name: ${{ env.PROD_TAG }}
+          name: Production Release - ${{ env.SERVICE_NAME }} ${{ env.VERSION }}
           body: |
-            Promoted `${{ inputs.service_name }}` from `uat_${{ inputs.uat_tag }}` to `prod_${{ inputs.uat_tag }}`.
-            Image URI: `${{ env.ECR_URI }}/${{ env.SERVICE_NAME }:prod_${{ inputs.uat_tag }}}`
+            Promoted `${{ env.SERVICE_NAME }}` from `uat_${{ env.VERSION }}` to `prod_${{ env.VERSION }}`.
+            
+            Image URI: `${{ env.ECR_URI }}/${{ env.SERVICE_NAME }}:${{ env.PROD_TAG }}`
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
