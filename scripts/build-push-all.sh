@@ -12,8 +12,9 @@ if [[ -z "$ENVIRONMENT" ]]; then
 fi
 
 # === Image tag generation ===
-TIMESTAMP=$(date +%Y%m%d%H%M)
-IMAGE_TAG="${ENVIRONMENT}_${TIMESTAMP}"
+: "${TIMESTAMP:=$(date +%Y%m%d%H%M)}"
+: "${IMAGE_TAG:=${ENVIRONMENT}_${TIMESTAMP}}"
+ENVIRONMENT_TAG="${ENVIRONMENT}"
 
 # === Validate AWS vars ===
 if [[ -z "${AWS_REGION:-}" || -z "${AWS_ACCOUNT_ID:-}" ]]; then
@@ -31,38 +32,54 @@ echo "SERVICE_NAME: ${SERVICE_NAME:-<all>}"
 aws ecr get-login-password --region "$AWS_REGION" | \
   docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
 
-# === Build logic ===
+# === Build and Push Logic ===
 build_and_push() {
   local dir="$1"
   local svc_name
   svc_name=$(basename "$dir" | tr '_' '-')
 
-  IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$svc_name:$IMAGE_TAG"
-  LATEST_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$svc_name:latest"
+  BASE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$svc_name"
+  IMAGE_URI="$BASE_URI:$IMAGE_TAG"
+  ENV_URI="$BASE_URI:$ENVIRONMENT_TAG"
 
   echo "🚧 Building image for service: $svc_name"
+
+  # Build ONLY ONCE (with timestamped tag)
   docker build -t "$IMAGE_URI" "$dir"
-  docker tag "$IMAGE_URI" "$LATEST_URI"
 
-  echo "📤 Pushing to ECR: $IMAGE_URI and $LATEST_URI"
+  # Tag ALSO for environment (qa, uat, prod)
+  echo "🔖 Tagging image as ${ENVIRONMENT_TAG}"
+  docker tag "$IMAGE_URI" "$ENV_URI"
+
+  # Push all 3 tags
+  echo "📤 Pushing all tags for $svc_name..."
   docker push "$IMAGE_URI"
-  docker push "$LATEST_URI"
+  docker push "$ENV_URI"
 
-  echo "✅ Finished: $svc_name"
+  echo ""
+  echo "🖼️ Tags pushed for $svc_name:"
+  echo "    → $IMAGE_TAG"
+  echo "    → $ENVIRONMENT_TAG"
+  echo ""
 }
 
 # === Single service or all ===
 if [[ -n "$SERVICE_NAME" ]]; then
-  TARGET_DIR=$(find . -type d -name "$SERVICE_NAME" | head -n 1)
+  TARGET_DIR=$(find . -type d -name "$SERVICE_NAME" -print -quit)
   if [[ -z "$TARGET_DIR" ]]; then
     echo "ERROR: Service directory for $SERVICE_NAME not found"
     exit 1
   fi
   build_and_push "$TARGET_DIR"
 else
-  find . -name "Dockerfile" | while read -r dockerfile; do
-    build_and_push "$(dirname "$dockerfile")"
+  # Safer find with -print0 and xargs -0
+  find . -name "Dockerfile" -print0 | xargs -0 -I{} dirname "{}" | while read -r dir; do
+    build_and_push "$dir"
   done
 fi
 
-echo "🚀 All image builds complete (tag: $IMAGE_TAG)"
+# Wait for all background pushes to finish
+wait
+
+echo ""
+echo "🚀 All image builds complete (tags: $IMAGE_TAG, $ENVIRONMENT_TAG)"
