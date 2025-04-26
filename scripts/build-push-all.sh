@@ -14,6 +14,7 @@ fi
 # === Image tag generation ===
 TIMESTAMP=$(date +%Y%m%d%H%M)
 IMAGE_TAG="${ENVIRONMENT}_${TIMESTAMP}"
+ENVIRONMENT_TAG="${ENVIRONMENT}"
 
 # === Validate AWS vars ===
 if [[ -z "${AWS_REGION:-}" || -z "${AWS_ACCOUNT_ID:-}" ]]; then
@@ -37,16 +38,22 @@ build_and_push() {
   local svc_name
   svc_name=$(basename "$dir" | tr '_' '-')
 
-  IMAGE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$svc_name:$IMAGE_TAG"
-  LATEST_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$svc_name:latest"
+  BASE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$svc_name"
+  IMAGE_URI="$BASE_URI:$IMAGE_TAG"
+  LATEST_URI="$BASE_URI:latest"
+  ENV_URI="$BASE_URI:$ENVIRONMENT_TAG"
 
   echo "🚧 Building image for service: $svc_name"
   docker build -t "$IMAGE_URI" "$dir"
-  docker tag "$IMAGE_URI" "$LATEST_URI"
 
-  echo "📤 Pushing to ECR: $IMAGE_URI and $LATEST_URI"
+  # Tag for latest and environment (e.g., dev/uat/prod)
+  docker tag "$IMAGE_URI" "$LATEST_URI"
+  docker tag "$IMAGE_URI" "$ENV_URI"
+
+  echo "📤 Pushing to ECR: $IMAGE_URI, $LATEST_URI, and $ENV_URI"
   docker push "$IMAGE_URI"
   docker push "$LATEST_URI"
+  docker push "$ENV_URI"
 
   echo "✅ Finished: $svc_name"
 }
@@ -65,4 +72,4 @@ else
   done
 fi
 
-echo "🚀 All image builds complete (tag: $IMAGE_TAG)"
+echo "🚀 All image builds complete (tags: $IMAGE_TAG, latest, $ENVIRONMENT_TAG)"
