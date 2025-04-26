@@ -8,11 +8,11 @@ on:
 
 jobs:
   Validate-PR-Source:
-    name: Validate PR source Branch
+    name: Validate PR Source Branch
     runs-on: ubuntu-latest
 
     steps:
-      - name: Validate PR source is develop or hotfix/*
+      - name: Validate Source is develop or hotfix/*
         run: |
           echo "Source branch: ${{ github.head_ref }}"
           if [[ "${{ github.head_ref }}" == "develop" || "${{ github.head_ref }}" == hotfix/* ]]; then
