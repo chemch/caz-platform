@@ -15,10 +15,6 @@ alerts = [
     Incident('Accounts Hijacked', 5),
 ]
 
-@app.route('/metrics')
-def metrics():
-    return Response(generate_latest(), mimetype=CONTENT_TYPE_LATEST)
-
 @app.route('/')
 def get_alerts():
     _alerts = []
@@ -61,7 +57,6 @@ def add_incident():
     incident = IncidentSchema().load(request.get_json())
     alerts.append(incident)
     return "", 204
-
 
 if __name__ == "__main__":
     app.run()

@@ -1,20 +1,20 @@
-name: Promote Single Service to Prod
+name: Create Prod Release
 
 on:
   workflow_dispatch:
     inputs:
       service_name:
-        description: Service name (e.g. detection-svc)
+        description: Service
         required: true
         type: string
       uat_tag:
-        description: UAT tag to promote (e.g. v2.4)
+        description: UAT Tag to Promote
         required: true
         type: string
 
 jobs:
-  promote:
-    name: Promote ${{ inputs.service_name }} to prod
+  promote-to-prod:
+    name: Promote ${{ inputs.service_name }} to Production
     runs-on: ubuntu-latest
 
     env:
@@ -27,7 +27,7 @@ jobs:
       ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
     steps:
-      - name: Configure AWS credentials
+      - name: Configure AWS Creds
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
