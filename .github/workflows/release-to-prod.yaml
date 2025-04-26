@@ -1,0 +1,46 @@
+name: Promote Single Service to Prod
+
+on:
+  workflow_dispatch:
+    inputs:
+      service_name:
+        description: Service name (e.g. detection-svc)
+        required: true
+        type: string
+      uat_tag:
+        description: UAT tag to promote (e.g. v2.4)
+        required: true
+        type: string
+
+jobs:
+  promote:
+    name: Promote ${{ inputs.service_name }} to prod
+    runs-on: ubuntu-latest
+
+    env:
+      SERVICE_NAME: ${{ inputs.service_name }}
+      VERSION: ${{ inputs.uat_tag }}
+      UAT_TAG: uat_${{ inputs.uat_tag }}
+      PROD_TAG: prod_${{ inputs.uat_tag }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      ECR_URI: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Promote $SERVICE_NAME:$UAT_TAG → $PROD_TAG
+        run: |
+          docker pull "$ECR_URI/$SERVICE_NAME:$UAT_TAG"
+          docker tag "$ECR_URI/$SERVICE_NAME:$UAT_TAG" "$ECR_URI/$SERVICE_NAME:$PROD_TAG"
+          docker push "$ECR_URI/$SERVICE_NAME:$PROD_TAG"
+          echo "Promoted $SERVICE_NAME:$UAT_TAG → $PROD_TAG"
