@@ -32,4 +32,4 @@ This will build the `alert-svc` service from `./alert-svc` and start it on [http
 
 ---
 
-For development or troubleshooting, you can use the `bootstrap.sh` script as the container entrypoint. All dependencies are installed via Pipenv and included in the image.
+[CS686_FinalProject.mp4](../../Documents/CS686%20Final/CS686_FinalProject.mp4)
