@@ -70,10 +70,10 @@ jobs:
         run: chmod +x ${{ github.workspace }}/scripts/*
 
       - name: Run Build and Push Script
-        run: ./scripts/build-push-all.sh "$ENVIRONMENT" "$SERVICE_NAME"
+        run: ./scripts/build-push-images.sh "$ENVIRONMENT" "$SERVICE_NAME"
 
       - name: Trigger Deploy Workflow
-        run: ./scripts/trigger-deploy.sh "$ENVIRONMENT" "$SERVICE_NAME"
+        run: ./scripts/deploy-services.sh "$ENVIRONMENT" "$SERVICE_NAME"
         env:
           REPO_OWNER: ${{ github.repository_owner }}
           GH_TOKEN: ${{ secrets.REPO_PAT }}
