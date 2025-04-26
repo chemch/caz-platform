@@ -45,7 +45,7 @@ jobs:
           docker push "$ECR_URI/$SERVICE_NAME:$PROD_TAG"
           echo "Promoted $SERVICE_NAME:$UAT_TAG → $PROD_TAG"
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release w/ Tag
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.PROD_TAG }}
