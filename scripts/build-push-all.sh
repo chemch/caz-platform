@@ -11,9 +11,9 @@ if [[ -z "$ENVIRONMENT" ]]; then
   exit 1
 fi
 
-# === Image tag generation ===
-: "${TIMESTAMP:=$(date +%Y%m%d%H%M)}"
-: "${IMAGE_TAG:=${ENVIRONMENT}_${TIMESTAMP}}"
+# === Force Image tag generation ===
+TIMESTAMP=$(date +%Y%m%d%H%M)
+IMAGE_TAG="${ENVIRONMENT}_${TIMESTAMP}"
 ENVIRONMENT_TAG="${ENVIRONMENT}"
 
 # === Validate AWS vars ===
