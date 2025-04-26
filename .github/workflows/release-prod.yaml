@@ -43,7 +43,7 @@ jobs:
           docker pull "$ECR_URI/$SERVICE_NAME:$UAT_TAG"
           docker tag "$ECR_URI/$SERVICE_NAME:$UAT_TAG" "$ECR_URI/$SERVICE_NAME:$PROD_TAG"
           docker push "$ECR_URI/$SERVICE_NAME:$PROD_TAG"
-          echo "✅ Promoted $SERVICE_NAME:$UAT_TAG → $PROD_TAG"
+          echo "Promoted $SERVICE_NAME:$UAT_TAG → $PROD_TAG"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
