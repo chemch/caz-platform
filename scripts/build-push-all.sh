@@ -40,27 +40,26 @@ build_and_push() {
 
   BASE_URI="$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$svc_name"
   IMAGE_URI="$BASE_URI:$IMAGE_TAG"
-  LATEST_URI="$BASE_URI:latest"
   ENV_URI="$BASE_URI:$ENVIRONMENT_TAG"
 
   echo "🚧 Building image for service: $svc_name"
+
+  # Build ONLY ONCE (with timestamped tag)
   docker build -t "$IMAGE_URI" "$dir"
 
-  echo "🔖 Tagging $svc_name with latest and $ENVIRONMENT"
-  docker tag "$IMAGE_URI" "$LATEST_URI"
+  # Tag ALSO for environment (qa, uat, prod)
+  echo "🔖 Tagging image as ${ENVIRONMENT_TAG}"
   docker tag "$IMAGE_URI" "$ENV_URI"
 
-  echo "📤 Pushing $svc_name images to ECR..."
-  docker push "$IMAGE_URI" &
-  docker push "$LATEST_URI" &
-  docker push "$ENV_URI" &
+  # Push all 3 tags
+  echo "📤 Pushing all tags for $svc_name..."
+  docker push "$IMAGE_URI"
+  docker push "$ENV_URI"
 
-  # Print nice report
   echo ""
   echo "🖼️ Tags pushed for $svc_name:"
   echo "    → $IMAGE_TAG"
-  echo "    → latest"
-  echo "    → $ENVIRONMENT"
+  echo "    → $ENVIRONMENT_TAG"
   echo ""
 }
 
@@ -83,4 +82,4 @@ fi
 wait
 
 echo ""
-echo "🚀 All image builds complete (tags: $IMAGE_TAG, latest, $ENVIRONMENT_TAG)"
+echo "🚀 All image builds complete (tags: $IMAGE_TAG, $ENVIRONMENT_TAG)"
