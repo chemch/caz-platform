@@ -42,8 +42,12 @@ jobs:
         run: |
           docker pull "$ECR_URI/$SERVICE_NAME:$QA_TAG"
           docker tag "$ECR_URI/$SERVICE_NAME:$QA_TAG" "$ECR_URI/$SERVICE_NAME:$UAT_TAG"
+          docker tag "$ECR_URI/$SERVICE_NAME:$QA_TAG" "$ECR_URI/$SERVICE_NAME:uat"
+
           docker push "$ECR_URI/$SERVICE_NAME:$UAT_TAG"
-          echo "✅ Promoted $SERVICE_NAME:$QA_TAG → $UAT_TAG"
+          docker push "$ECR_URI/$SERVICE_NAME:uat"
+
+          echo "✅ Promoted $SERVICE_NAME:$QA_TAG → $UAT_TAG and uat"
 
       - name: Trigger UAT Deployment
         run: |
